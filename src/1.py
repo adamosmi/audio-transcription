@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from pyannote.audio import Pipeline
+import torch
+from pydub import AudioSegment
 
 dotenv_path = os.path.join('config', '.env')
 load_dotenv(dotenv_path=dotenv_path)
@@ -13,10 +15,10 @@ pipeline = Pipeline.from_pretrained(
     use_auth_token=HF_ACCESS_TOKEN)
 
 # send pipeline to GPU (when available)
-import torch
 pipeline.to(torch.device("cuda"))
 
 AUDIO_FP = os.path.join("data", "external", "transcription_test.wav")
+
 # apply pretrained pipeline
 diarization = pipeline(AUDIO_FP)
 
@@ -26,17 +28,11 @@ for turn, _, speaker in diarization.itertracks(yield_label=True):
     diarization_results.append({"start": turn.start, "stop": turn.end, "speaker": speaker})
     print(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker_{speaker}")
 
-# process each segment
-from pydub import AudioSegment
-
-# load the original audio file
+# load the original audio file for segmenting
 original_audio = AudioSegment.from_file(AUDIO_FP)
 
+# process each segment
 for i, segment_info in enumerate(diarization_results):
-    # convert start and stop times to milliseconds
-    # start_ms = int(segment_info["start"] * 1000)
-    # stop_ms = int(segment_info["stop"] * 1000)
-
     # convert start and stop times to milliseconds
     start_ms = segment_info["start"] * 1000 // 1 # take floor
     stop_ms = (segment_info["stop"] * 1000 // 1) + 1 # take ceiling
@@ -51,3 +47,5 @@ for i, segment_info in enumerate(diarization_results):
 
     # print confirmation
     print(f"Segment {i} for {segment_info['speaker']} saved.")
+
+# run transcriptions with openai whisper

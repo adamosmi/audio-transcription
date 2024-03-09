@@ -15,13 +15,36 @@ pipeline = Pipeline.from_pretrained(
 import torch
 pipeline.to(torch.device("cuda"))
 
+AUDIO_FP = os.path.join("data", "external", "transcription_test.wav")
 # apply pretrained pipeline
-diarization = pipeline("data/external/transcription_test.wav")
+diarization = pipeline(AUDIO_FP)
 
+diarization_results = []
 # print the result
 for turn, _, speaker in diarization.itertracks(yield_label=True):
+    diarization_results.append({"start": turn.start, "stop": turn.end, "speaker": speaker})
     print(f"start={turn.start:.1f}s stop={turn.end:.1f}s speaker_{speaker}")
-# start=0.2s stop=1.5s speaker_0
-# start=1.8s stop=3.9s speaker_1
-# start=4.2s stop=5.7s speaker_0
-# ...
+
+# process each segment
+from pydub import AudioSegment
+
+# load the original audio file
+original_audio = AudioSegment.from_file(AUDIO_FP)
+
+for i, segment_info in enumerate(diarization_results):
+    # convert start and stop times to milliseconds
+    # start_ms = int(segment_info["start"] * 1000)
+    # stop_ms = int(segment_info["stop"] * 1000)
+
+    # convert start and stop times to milliseconds
+    start_ms = segment_info["start"] * 1000 // 1 # take floor
+    stop_ms = (segment_info["stop"] * 1000 // 1) + 1 # take ceiling
+    
+    # extract the segment
+    segment = original_audio[start_ms:stop_ms]
+    
+    # optionally, save the segment to a new file
+    segment.export(os.path.join("data", "external", f"segment_{i}_{segment_info['speaker']}.wav"), format="wav")
+
+    # print confirmation
+    print(f"Segment {i} for {segment_info['speaker']} saved.")

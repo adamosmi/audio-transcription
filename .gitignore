@@ -1,4 +1,3 @@
 .venv/
 .env
-data/external/transcription_test.m4a
-data/external/transcription_test.wav
+data/external/

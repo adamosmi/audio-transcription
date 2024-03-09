@@ -71,13 +71,17 @@ print("Transcribing...")
 for i, res in diarization_results_full.items():
     # transcribe each file
     audio_file = open(res['fp'], "rb")
-    transcription = client.audio.transcriptions.create(
-      model="whisper-1", 
-      file=audio_file
-    )
-
     updated_res = res.copy()
-    updated_res['transcription'] = transcription.text
+
+    try:
+        transcription = client.audio.transcriptions.create(
+          model="whisper-1", 
+          file=audio_file
+        )
+        updated_res['transcription'] = transcription.text
+    except Exception as e:
+        updated_res['transcription'] = "ERROR"
+
     diarization_results_full[i] = updated_res
 
 # save json
@@ -85,3 +89,4 @@ with open(os.path.join(OUTPUT_FP, 'analysis.json'), 'w') as f:
     json.dump(obj=diarization_results_full, fp=f)
 
 
+print("Done.")

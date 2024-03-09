@@ -1,3 +1,4 @@
+import time
 import os
 from dotenv import load_dotenv
 from datetime import datetime
@@ -7,6 +8,8 @@ from pydub import AudioSegment
 import openai
 import json
 
+
+start = time.perf_counter()
 dotenv_path = os.path.join('config', '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
@@ -15,8 +18,8 @@ HF_ACCESS_TOKEN = os.getenv('HF_ACCESS_TOKEN')
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 # file paths
-AUDIO_FP = os.path.join("data", "external", "transcription_test.wav")
-OUTPUT_FP = os.path.join("data", "processed", datetime.now().strftime("%d_%m_%Y %H:%M:%S"))
+AUDIO_FP = os.path.join("data", "external", "ten_min_test.mp3")
+OUTPUT_FP = os.path.join("data", "processed", datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
 os.makedirs(OUTPUT_FP, exist_ok=True)
 
 print("Running diarization...")
@@ -88,5 +91,5 @@ for i, res in diarization_results_full.items():
 with open(os.path.join(OUTPUT_FP, 'analysis.json'), 'w') as f:
     json.dump(obj=diarization_results_full, fp=f)
 
-
-print("Done.")
+stop = time.perf_counter()
+print(f"Done. Seconds: {stop - start}")

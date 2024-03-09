@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 from pyannote.audio import Pipeline
 
 dotenv_path = os.path.join('config', '.env')
@@ -44,7 +45,9 @@ for i, segment_info in enumerate(diarization_results):
     segment = original_audio[start_ms:stop_ms]
     
     # optionally, save the segment to a new file
-    segment.export(os.path.join("data", "external", f"segment_{i}_{segment_info['speaker']}.wav"), format="wav")
+    OUTPUT_FP = os.path.join("data", "processed", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+    os.makedirs(OUTPUT_FP, exist_ok=True)
+    segment.export(os.path.join(OUTPUT_FP, f"segment_{i}_{segment_info['speaker']}.wav"), format="wav")
 
     # print confirmation
     print(f"Segment {i} for {segment_info['speaker']} saved.")

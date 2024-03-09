@@ -3,18 +3,20 @@ from dotenv import load_dotenv
 from pyannote.audio import Pipeline
 
 dotenv_path = os.path.join('config', '.env')
-HF_ACCESS_TOKEN = load_dotenv(dotenv_path=dotenv_path)
+load_dotenv(dotenv_path=dotenv_path)
+
+HF_ACCESS_TOKEN = os.getenv('HF_ACCESS_TOKEN')
 
 pipeline = Pipeline.from_pretrained(
     "pyannote/speaker-diarization-3.1",
-    use_auth_token="HUGGINGFACE_ACCESS_TOKEN_GOES_HERE")
+    use_auth_token=HF_ACCESS_TOKEN)
 
 # send pipeline to GPU (when available)
 import torch
 pipeline.to(torch.device("cuda"))
 
 # apply pretrained pipeline
-diarization = pipeline("data/external/audio.wav")
+diarization = pipeline("data/external/transcription_test.wav")
 
 # print the result
 for turn, _, speaker in diarization.itertracks(yield_label=True):

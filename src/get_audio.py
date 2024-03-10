@@ -27,6 +27,8 @@ command = [
     'ffmpeg',
     '-i', os.path.join(OUTPUT_FP, output_filename), # input
     '-b:a', stream_bitrate_ffmpeg, # set bitrate to match input
+    '-ar', 16000, # 16kHz sample rate for pyannote
+    '-ac', 1, # mono channel for pyannote
     os.path.join(OUTPUT_FP, stream_name + '.mp3') 
 ]
 

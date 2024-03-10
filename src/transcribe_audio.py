@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from pyannote.audio import Pipeline
+from pyannote.audio.pipelines.utils.hook import ProgressHook
 import torch
 from pydub import AudioSegment
 import openai
@@ -32,7 +33,8 @@ pipeline = Pipeline.from_pretrained(
 pipeline.to(torch.device("cuda"))
 
 # apply pretrained pipeline
-diarization = pipeline(AUDIO_FP)
+with ProgressHook() as hook:
+    diarization = pipeline(AUDIO_FP, hook=hook)
 
 diarization_results = []
 # print the result

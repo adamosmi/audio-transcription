@@ -27,7 +27,7 @@ stream.download(output_path=OUTPUT_FP, filename=output_filename)
 command = [
     'ffmpeg',
     '-i', os.path.join(OUTPUT_FP, output_filename), # input
-    '-acodec', 'pcm_s16le' # wav codec
+    '-acodec', 'pcm_s16le', # wav codec
     '-ac', '1', # mono channel for pyannote
     '-ar', '16000', # 16kHz sample rate for pyannote
     '-ab', '256k', # set bitrate

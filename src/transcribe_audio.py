@@ -19,7 +19,7 @@ HF_ACCESS_TOKEN = os.getenv('HF_ACCESS_TOKEN')
 OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 # file paths
-AUDIO_FP = os.path.join('data', 'external', 'youtube', '10_03_2024_14_19_14', 'Murder on the Web: Catfish Gone Wrong! | Mystery & Makeup | Bailey Sarian.mp3')
+AUDIO_FP = os.path.join('data', 'external', 'youtube', '10_03_2024_18_34_52', 'Murder on the Web: Catfish Gone Wrong! | Mystery & Makeup | Bailey Sarian.wav')
 OUTPUT_FP = os.path.join("data", "processed", datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))
 os.makedirs(OUTPUT_FP, exist_ok=True)
 
@@ -30,7 +30,9 @@ pipeline = Pipeline.from_pretrained(
     use_auth_token=HF_ACCESS_TOKEN)
 
 # send pipeline to GPU (when available)
-pipeline.to(torch.device("cuda"))
+if torch.cuda.is_available():
+    print("Using cuda...")
+    pipeline.to(torch.device('cuda'))
 
 # apply pretrained pipeline
 with ProgressHook() as hook:
